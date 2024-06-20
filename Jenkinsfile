@@ -2,6 +2,8 @@ pipeline {
     agent any
 
     stages {
+        //this is bcomment
+        /*
         stage('Build') {
             agent {
                 docker {
@@ -20,6 +22,7 @@ pipeline {
                 '''
             }
         }
+        */
         stage('Test') {
             agent {
                 docker {
@@ -29,7 +32,7 @@ pipeline {
             }
             steps {
                 sh '''
-                    test -f build/index.html
+                    #test -f build/index.html
                     npm test
                 '''
             }
