@@ -3,6 +3,10 @@ pipeline {
 
     environment {
         NETLIFY_SITE_ID = '86fd69ec-c94b-489a-90a6-8187caba107e'
+
+        //netlify-token is stored at Dashboard>Manage Jenkins>Credentials>System>Global credentials (unrestricted)
+        NETLIFY_AUTH_TOKEN = credentials('netlify-token') 
+
     }
 
     stages {
