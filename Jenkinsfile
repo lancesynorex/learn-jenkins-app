@@ -17,7 +17,13 @@ pipeline {
                     npm ci
                     npm run build
                     ls -la
-                    echo "Checking build/index.html is exist?"
+                '''
+            }
+        }
+        stage('Test') {         
+            steps {
+                sh '''                  
+                    echo "Test stage"
                     [ -f build/index.html ] && echo "index.html exists" || echo "index.html does not exist"
                     echo "Running test.."
                     npm test
