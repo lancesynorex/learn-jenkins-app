@@ -1,13 +1,7 @@
 pipeline {
     agent any
 
-    environment {
-        NETLIFY_SITE_ID = '86fd69ec-c94b-489a-90a6-8187caba107e'
-
-        //netlify-token is stored at Dashboard>Manage Jenkins>Credentials>System>Global credentials (unrestricted)
-        NETLIFY_AUTH_TOKEN = credentials('netlify-token') 
-
-    }
+    
 
     stages {
         
@@ -72,7 +66,7 @@ pipeline {
 
                     post {
                         always {
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Local Report', reportTitles: '', useWrapperFileDirectly: true])
                         }
                     }
                 }
@@ -95,6 +89,33 @@ pipeline {
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir=build --prod
                 '''
+            }
+        }
+
+        stage('Prod E2E') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true
+                }
+            }
+            environment {
+                NETLIFY_SITE_ID = '86fd69ec-c94b-489a-90a6-8187caba107e'
+                //netlify-token is stored at Dashboard>Manage Jenkins>Credentials>System>Global credentials (unrestricted)
+                NETLIFY_AUTH_TOKEN = credentials('netlify-token') 
+                CI_ENVIRONMENT_URL = 'https://lance-hello-word.netlify.app';
+            }
+
+            steps {
+                sh '''
+                    npx playwright test  --reporter=html
+                '''
+            }
+
+            post {
+                always {
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright E2E Report', reportTitles: '', useWrapperFileDirectly: true])
+                }
             }
         }
     }
